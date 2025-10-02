@@ -1,26 +1,21 @@
-function Get(keyword) {
-    return fetch("backend.php?keyword=" + encodeURIComponent(keyword)).then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
+function GetSet(keyword, params = {}) {
+    return $.ajax({
+        url: "backend.php",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({ keyword: keyword, params: params}),
+    })
+        .then(response => {
+            if (response && response.success === false) {
+                return Promise.reject(response.message || "Operation failed.");
+            }
 
-        return response.json();
-    });
-}
-
-function Set(keyword, params) {
-    return fetch("backend.php?keyword=" + encodeURIComponent(keyword), {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(params) // send parameters in body
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        return response.json();
-    });
+            return response;
+        })
+        .catch(error => {
+            return Promise.reject(error);
+        });
 }
 
 function ValidateInput(value, type) {
